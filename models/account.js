@@ -17,18 +17,21 @@ const accountSchema = new Schema({
     },
     isConfirmed: { 
         type: Boolean,
-        default: false
+        default: false,
+        required: false
     },
     created_at: { 
-        type: Date, 
+        type: Date,
+        required: false
     },
     updated_at: { 
-        type: Date, 
+        type: Date,
+        required: false
     }
 
 })
 
-patientSchema.pre('save', function(next){
+accountSchema.pre('save', function(next){
     now = new Date();
     this.updated_at = now;
     if ( !this.created_at ) {
