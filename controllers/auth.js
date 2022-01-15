@@ -19,7 +19,9 @@ exports.signup = (req, res, next) => {
                   message: 'User created !',
                   status: 201
                 }))
-                .catch(error => res.status(400).json({ error }));
+                .catch(error => {
+                  res.status(400).json({"error": error, "Data":user});
+                });
         })
         .catch(error => res.status(500).json({ error }));
 };
