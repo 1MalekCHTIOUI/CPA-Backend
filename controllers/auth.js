@@ -20,7 +20,7 @@ exports.signup = (req, res, next) => {
                   status: 201
                 }))
                 .catch(error => {
-                  res.status(400).json({"error": error.message, "Data":user});
+                  res.status(400).json({"error": error.message});
                 });
         })
         .catch(error => res.status(500).json({ error }));
