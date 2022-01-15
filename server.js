@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 5000;
 const path = require('path')
 const authRouter = require('./routes/auth');
 app.use(cors());
+app.options('*', cors());
 app.use(express.json());
 require("dotenv").config({ path: path.resolve(__dirname, './.env') })
 
