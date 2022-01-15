@@ -14,17 +14,6 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopolo
 
 app.use('/api/auth', authRouter);
 
-
-
-if(process.env.NODE_ENV === 'production') {
-  app.use(express.static('../build'));
-  app.use(express.static(path.resolve(__dirname, "../build")));
-  app.get("*", function (request, response) {
-    response.sendFile(path.resolve(__dirname, "..", 'build', "index.html"));
-  });
-
-}
-
 app.listen(PORT, () =>{
     console.log("Server is running on Port: " + PORT);
 })
