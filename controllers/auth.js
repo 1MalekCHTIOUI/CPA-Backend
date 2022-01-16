@@ -4,6 +4,7 @@ const User = require('../models/account');
 exports.test = (req, res, next) => {
   res.send("TEST API")
 }
+
 exports.signup = (req, res, next) => {
   console.log(req.body);
   bcrypt.hash(req.body.password, 10)
@@ -27,32 +28,36 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  const { email, password } = req.body;
+  if(!email || !password) {
+      return res.status(400).json({msg: "Veuillez saisir tous les champs"})
+  }
+  User.findOne({email})
       .then(user => {
-        if (!user) {
-          return res.status(401).json({ error: 'User not found !' });
-        }
-        bcrypt.compare(req.body.password, user.password)
-          .then(valid => {
-            if (!valid) {
-              return res.status(401).json({ error: 'Wrong password !' });
-            }
-            res.status(200).json({
-              userId: user._id,
-              token: jwt.sign(
-                { userId: user._id },
-                'jwt_secret',
-                { expiresIn: '2h' }
+          if(!user) res.status(400).json({msg: "L'utilisateur n'existe pas"})
+          bcrypt.compare(password, user.password)
+          .then(isMatch => {
+              if(!isMatch) return res.status(400).json({msg: "Les informations d'identification sont incorrect"});
+              jwt.sign(
+                  { id: user.id },
+                  'jwt_secret',
+                  (err, token) => {
+                      if(err) throw err;
+                      res.json({
+                          token,
+                          user: {
+                              id: user.id,
+                              name: user.name,
+                              email: user.email
+                          }
+                      })
+                  }
               )
-            });
-          })
-          .catch(error => res.status(500).json({ error }));
-      })
-      .catch(error => res.status(500).json({ error }));
+          }).catch(e => console.log(e.message))
+     }).catch(e => console.log(e.message))
 };
 
 exports.profile = (req, res, next) => {
-  User.findOne({ _id: req.params.id })
-    .then(user => res.status(200).json(user))
-    .catch(error => res.status(500).json({ error }));
+  User.findById(req.user.id)
+  .then(user => res.json(user)).catch(e => e.message);
 };
