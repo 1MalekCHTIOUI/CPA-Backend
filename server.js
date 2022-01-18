@@ -11,12 +11,12 @@ app.use(express.json());
 require("dotenv").config({ path: path.resolve(__dirname, './.env') })
 
 //REMOTE MONGO URI
-// mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => console.log("MongoDB has been connected"))
-// .catch((err) => console.log("MongoDB Not Connected"))
+mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => console.log("MongoDB has been connected"))
+.catch((err) => console.log("MongoDB Not Connected"))
 
 //LOCAL
-mongoose.connect("mongodb://127.0.0.1:27017/cpa", {useNewUrlParser: true, useUnifiedTopology: true}).then(() => console.log("MongoDB has been connected"))
-.catch((err) => console.log("MongoDB Not Connected"))
+// mongoose.connect("mongodb://127.0.0.1:27017/cpa", {useNewUrlParser: true, useUnifiedTopology: true}).then(() => console.log("MongoDB has been connected"))
+// .catch((err) => console.log("MongoDB Not Connected"))
 
 app.use('/api/auth', authRouter);
 
