@@ -6,38 +6,46 @@ exports.test = (req, res, next) => {
 }
 
 exports.signup = (req, res, next) => {
-  console.log(req.body);
-  bcrypt.hash(req.body.password, 10)
-  .then(hash => {
-    const user = new User({
-      username: req.body.username,
-      email: req.body.email,
-      password: hash,
-      isConfirmed: false
-    });
-            user.save()
-                .then(() => res.status(201).json({
-                  message: 'User created !',
-                  status: 201
-                }))
-                .catch(error => {
-                  res.status(400).json({"error": error.message});
-                });
-        })
-        .catch(error => res.status(500).json({ error }));
+  const username = req.body.username;
+  const email = req.body.email;
+  const password = req.body.password;
+  if(!last_name || !first_name || !email || !password){
+      return res.status(400).json({msg: "Veuillez saisir tous les champs"})
+  }
+  User.findOne({email})
+  .then(user => {
+      if(user) res.status(400).json({msg: "L'utilisateur déjà existe"})
+  })
+
+  const newUser = new User({
+    username,
+    email,
+    password
+  });
+
+  bcrypt.genSalt(10, (err, salt)=>{
+      bcrypt.hash(newUser.password, salt, (err, hash)=>{
+          if(err) throw err;
+          newUser.password = hash;
+          newUser.save()
+          .then(user => {
+              res.json({msg: "Registration Success"})
+          })
+      })
+  })
 };
 
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
   if(!email || !password) {
-      return res.status(400).json({msg: "Veuillez saisir tous les champs"})
+      return res.status(400).json({message: "Please fill all the fields!"})
   }
   User.findOne({email})
       .then(user => {
-          if(!user) res.status(400).json({msg: "L'utilisateur n'existe pas"})
+          if(!user) return res.status(400).json({message: "User does not exist!"})
           bcrypt.compare(password, user.password)
           .then(isMatch => {
-              if(!isMatch) return res.status(400).json({msg: "Les informations d'identification sont incorrect"});
+              if(!isMatch) return res.status(400).json({message: "Wrong credentials!"});
               jwt.sign(
                   { id: user.id },
                   'jwt_secret',
@@ -45,9 +53,10 @@ exports.login = (req, res, next) => {
                       if(err) throw err;
                       res.json({
                           token,
+                          status: "success",
                           user: {
                               id: user.id,
-                              name: user.name,
+                              username: user.username,
                               email: user.email
                           }
                       })
