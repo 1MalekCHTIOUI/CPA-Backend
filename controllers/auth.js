@@ -9,12 +9,12 @@ exports.signup = (req, res, next) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
-  if(!last_name || !first_name || !email || !password){
-      return res.status(400).json({msg: "Veuillez saisir tous les champs"})
+  if(!username || !email || !password){
+      return res.status(400).json({message: "Please fill all the fields!"})
   }
   User.findOne({email})
   .then(user => {
-      if(user) res.status(400).json({msg: "L'utilisateur déjà existe"})
+      if(user) return res.status(400).json({message: "This Email is already used!"})
   })
 
   const newUser = new User({
@@ -28,9 +28,7 @@ exports.signup = (req, res, next) => {
           if(err) throw err;
           newUser.password = hash;
           newUser.save()
-          .then(user => {
-              res.json({msg: "Registration Success"})
-          })
+          .then(user => res.status(200).json({msg: "Registration Success"}))
       })
   })
 };
